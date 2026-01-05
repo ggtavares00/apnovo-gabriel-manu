@@ -202,10 +202,16 @@ async def admin_page(request: Request, senha: str = ""):
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Admin - Acesso Restrito</title>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
                 <style>
+                    * {
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
+                    }
                     body {
                         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                        background: linear-gradient(135deg, #f5e6e8 0%, #d4a5a5 100%);
+                        background: linear-gradient(135deg, #f5f9f6 0%, #e8f3ea 50%, #d4e8d9 100%);
                         display: flex;
                         justify-content: center;
                         align-items: center;
@@ -214,42 +220,88 @@ async def admin_page(request: Request, senha: str = ""):
                     }
                     .login-box {
                         background: white;
-                        padding: 40px;
-                        border-radius: 15px;
-                        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                        padding: 50px 40px;
+                        border-radius: 20px;
+                        box-shadow: 0 15px 40px rgba(126, 175, 134, 0.2);
                         text-align: center;
-                        max-width: 400px;
+                        max-width: 420px;
+                        width: 90%;
                     }
-                    h2 { color: #d4a5a5; margin-bottom: 20px; }
+                    .lock-icon {
+                        font-size: 3.5rem;
+                        color: #7eaf86;
+                        margin-bottom: 20px;
+                        animation: pulse 2s ease-in-out infinite;
+                    }
+                    @keyframes pulse {
+                        0%, 100% { transform: scale(1); }
+                        50% { transform: scale(1.05); }
+                    }
+                    h2 { 
+                        color: #7eaf86; 
+                        margin-bottom: 15px;
+                        font-size: 1.8rem;
+                        font-weight: 600;
+                    }
+                    p {
+                        color: #3d4f42;
+                        margin-bottom: 30px;
+                        font-size: 1rem;
+                    }
                     input {
                         width: 100%;
-                        padding: 12px;
-                        margin: 10px 0;
-                        border: 2px solid #f0d9da;
-                        border-radius: 8px;
+                        padding: 15px;
+                        margin: 15px 0;
+                        border: 2px solid #a8c9b0;
+                        border-radius: 12px;
                         font-size: 16px;
+                        transition: all 0.3s ease;
+                        background: #f5f9f6;
+                    }
+                    input:focus {
+                        outline: none;
+                        border-color: #7eaf86;
+                        box-shadow: 0 0 0 4px rgba(126, 175, 134, 0.15);
+                        background: white;
                     }
                     button {
                         width: 100%;
-                        padding: 12px;
-                        background: #d4a5a5;
+                        padding: 15px;
+                        background: linear-gradient(135deg, #7eaf86 0%, #5a8c64 100%);
                         color: white;
                         border: none;
-                        border-radius: 8px;
+                        border-radius: 12px;
                         font-size: 16px;
+                        font-weight: 600;
                         cursor: pointer;
-                        margin-top: 10px;
+                        margin-top: 15px;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 5px 20px rgba(126, 175, 134, 0.3);
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 10px;
                     }
-                    button:hover { background: #c69090; }
+                    button:hover { 
+                        background: linear-gradient(135deg, #5a8c64 0%, #7eaf86 100%);
+                        transform: translateY(-2px);
+                        box-shadow: 0 8px 25px rgba(126, 175, 134, 0.4);
+                    }
+                    button:active {
+                        transform: translateY(0);
+                    }
                 </style>
             </head>
             <body>
                 <div class="login-box">
-                    <h2>🔒 Área Administrativa</h2>
+                    <i class="fas fa-lock lock-icon"></i>
+                    <h2>Área Administrativa</h2>
                     <p>Digite a senha para acessar:</p>
                     <form method="get">
                         <input type="password" name="senha" placeholder="Senha" required autofocus>
-                        <button type="submit">Entrar</button>
+                        <button type="submit">
+                            <i class="fas fa-sign-in-alt"></i> Entrar
+                        </button>
                     </form>
                 </div>
             </body>
