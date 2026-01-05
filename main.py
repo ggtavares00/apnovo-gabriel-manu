@@ -78,9 +78,15 @@ async def lifespan(app: FastAPI):
 # FastAPI app
 app = FastAPI(title="Chá de Casa Nova - RSVP", lifespan=lifespan)
 
-# Static files and templates
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# Templates
 templates = Jinja2Templates(directory="templates")
+
+# Static files (depois das rotas para evitar conflitos)
+@app.on_event("startup")
+async def configure_static_files():
+    pass
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 # Database dependency
@@ -127,10 +133,13 @@ async def enviar_email_confirmacao(nome: str):
             username=SMTP_USER,
             password=SMTP_PASSWORD,
             start_tls=True,
+            timeout=10,  # Timeout de 10 segundos
         )
         print(f"✅ E-mail enviado para {EMAIL_DESTINATARIO}")
+    except TimeoutError:
+        print(f"⚠️ Timeout ao enviar e-mail - ignorando para não bloquear confirmação")
     except Exception as e:
-        print(f"❌ Erro ao enviar e-mail: {e}")
+        print(f"❌ Erro ao enviar e-mail: {e} - ignorando para não bloquear confirmação")
 
 
 # Rotas principais
@@ -174,11 +183,9 @@ async def confirmar_presenca(
     await db.commit()
     await db.refresh(nova_confirmacao)
 
-    # Enviar e-mail (não-bloqueante)
-    try:
-        await enviar_email_confirmacao(nova_confirmacao.nome)
-    except Exception as e:
-        print(f"Erro ao enviar e-mail: {e}")
+    # Enviar e-mail em background (não bloqueia a resposta)
+    import asyncio
+    asyncio.create_task(enviar_email_confirmacao(nova_confirmacao.nome))
 
     return nova_confirmacao
 
