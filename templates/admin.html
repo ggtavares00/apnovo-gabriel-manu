@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Chá de Casa Nova</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container admin-container">
+        <header class="header">
+            <h1 class="title">🔐 Área Administrativa</h1>
+            <h2 class="subtitle">Chá de Casa Nova - Manu e Gabriel</h2>
+        </header>
+
+        <main class="main-content">
+            <div class="card admin-card">
+                <div class="admin-header">
+                    <h3>Lista de Confirmados</h3>
+                    <div class="admin-actions">
+                        <button id="refreshBtn" class="btn-action">🔄 Atualizar</button>
+                        <a id="exportBtn" class="btn-action btn-export">📥 Exportar CSV</a>
+                    </div>
+                </div>
+
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <span class="stat-number" id="totalCount">-</span>
+                        <span class="stat-label">Confirmações</span>
+                    </div>
+                </div>
+
+                <div id="loadingIndicator" class="loading">
+                    Carregando...
+                </div>
+
+                <div id="confirmadosContainer" class="confirmados-container">
+                    <!-- Lista será preenchida via JavaScript -->
+                </div>
+
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+            </div>
+
+            <div class="back-link">
+                <a href="/">← Voltar para página principal</a>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Obter senha da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const senha = urlParams.get('senha');
+
+        if (!senha) {
+            window.location.href = '/admin';
+        }
+
+        // Função para carregar confirmados
+        async function carregarConfirmados() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const confirmadosContainer = document.getElementById('confirmadosContainer');
+            const errorMessage = document.getElementById('errorMessage');
+            const totalCount = document.getElementById('totalCount');
+
+            loadingIndicator.style.display = 'block';
+            errorMessage.style.display = 'none';
+            confirmadosContainer.innerHTML = '';
+
+            try {
+                const response = await fetch(`/admin/confirmados?senha=${senha}`);
+                
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar confirmados');
+                }
+
+                const data = await response.json();
+                loadingIndicator.style.display = 'none';
+
+                // Atualizar contador
+                totalCount.textContent = data.total;
+
+                if (data.confirmacoes.length === 0) {
+                    confirmadosContainer.innerHTML = '<p class="empty-message">Nenhuma confirmação ainda.</p>';
+                    return;
+                }
+
+                // Criar tabela
+                const table = document.createElement('table');
+                table.className = 'confirmados-table';
+                table.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nome</th>
+                            <th>Data Confirmação</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.confirmacoes.map(c => `
+                            <tr>
+                                <td>${c.id}</td>
+                                <td>${c.nome}</td>
+                                <td>${c.data_confirmacao}</td>
+                                <td><span class="status-badge">${c.status}</span></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                `;
+
+                confirmadosContainer.appendChild(table);
+
+            } catch (error) {
+                loadingIndicator.style.display = 'none';
+                errorMessage.textContent = 'Erro ao carregar dados. Verifique sua senha.';
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        // Atualizar link de exportação
+        const exportBtn = document.getElementById('exportBtn');
+        exportBtn.href = `/admin/confirmados/csv?senha=${senha}`;
+
+        // Event listeners
+        document.getElementById('refreshBtn').addEventListener('click', carregarConfirmados);
+
+        // Carregar dados ao iniciar
+        carregarConfirmados();
+    </script>
+</body>
+</html>

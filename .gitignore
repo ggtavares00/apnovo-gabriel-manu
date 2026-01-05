@@ -1,0 +1,36 @@
+# Arquivos gerados automaticamente
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.db
+confirmacoes.db
+
+# Ambientes virtuais
+venv/
+env/
+ENV/
+.venv
+
+# Variáveis de ambiente
+.env
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Distribuição / empacotamento
+dist/
+build/
+*.egg-info/
